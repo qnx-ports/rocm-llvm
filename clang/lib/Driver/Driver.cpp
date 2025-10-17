@@ -42,6 +42,7 @@
 #include "ToolChains/PPCFreeBSD.h"
 #include "ToolChains/PPCLinux.h"
 #include "ToolChains/PS4CPU.h"
+#include "ToolChains/QNX.h"
 #include "ToolChains/SPIRV.h"
 #include "ToolChains/SPIRVOpenMP.h"
 #include "ToolChains/SYCL.h"
@@ -6966,6 +6967,9 @@ const ToolChain &Driver::getToolChain(const ArgList &Args,
       break;
     case llvm::Triple::ZOS:
       TC = std::make_unique<toolchains::ZOS>(*this, Target, Args);
+      break;
+    case llvm::Triple::QNX:
+      TC = std::make_unique<toolchains::QNX>(*this, Target, Args);
       break;
     case llvm::Triple::Vulkan:
     case llvm::Triple::ShaderModel:

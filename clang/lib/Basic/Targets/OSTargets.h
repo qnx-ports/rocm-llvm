@@ -1035,6 +1035,39 @@ public:
   }
 };
 
+// QNX Target
+template <typename Target>
+class LLVM_LIBRARY_VISIBILITY QNXTargetInfo : public OSTargetInfo<Target> {
+protected:
+  void getOSDefines(const LangOptions &Opts, const llvm::Triple &Triple,
+                    MacroBuilder &Builder) const override {
+    // QNX defines
+    DefineStd(Builder, "unix", Opts);
+    Builder.defineMacro("__QNXNTO__");
+    Builder.defineMacro("__QNX__", "800");
+    Builder.defineMacro("__ELF__");
+    Builder.defineMacro("__LITTLEENDIAN__");
+    Builder.defineMacro("_QNX_SOURCE");
+    Builder.defineMacro("QNX_LIBM_BUILTINS"); // required if using the default QNX libc++
+
+    switch (Triple.getArch()) {
+    default:
+      break;
+    case llvm::Triple::aarch64:
+      Builder.defineMacro("__AARCH64LE__");
+      break;
+    case llvm::Triple::x86_64:
+      Builder.defineMacro("__X86_64__");
+      break;
+    }
+  }
+
+public:
+  QNXTargetInfo(const llvm::Triple &Triple, const TargetOptions &Opts)
+      : OSTargetInfo<Target>(Triple, Opts) {
+  }
+};
+
 } // namespace targets
 } // namespace clang
 #endif // LLVM_CLANG_LIB_BASIC_TARGETS_OSTARGETS_H

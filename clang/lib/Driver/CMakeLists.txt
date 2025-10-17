@@ -77,6 +77,7 @@ add_clang_library(clangDriver
   ToolChains/OHOS.cpp
   ToolChains/OpenBSD.cpp
   ToolChains/PS4CPU.cpp
+  ToolChains/QNX.cpp
   ToolChains/Solaris.cpp
   ToolChains/SPIRV.cpp
   ToolChains/SPIRVOpenMP.cpp

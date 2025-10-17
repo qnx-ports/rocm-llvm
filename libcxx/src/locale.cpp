@@ -938,6 +938,8 @@ const ctype<char>::mask* ctype<char>::classic_table() noexcept {
   return _ctype_ + 1;
 #  elif defined(_AIX)
   return (const unsigned int*)__lc_ctype_ptr->obj->mask;
+#  elif defined(__QNX__)
+  return &_Getchrtype(0);
 #  elif defined(__MVS__)
 #    if defined(__NATIVE_ASCII_F)
   return const_cast<const ctype<char>::mask*>(__OBJ_DATA(__lc_ctype_a)->mask);

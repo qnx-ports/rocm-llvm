@@ -306,8 +306,10 @@ _LIBCPP_HARDENING_MODE_DEBUG
 #  define static_assert(...) _Static_assert(__VA_ARGS__)
 #  define decltype(...) __decltype(__VA_ARGS__)
 
-typedef __char16_t char16_t;
-typedef __char32_t char32_t;
+#    if !defined(__QNX__)
+       typedef __char16_t char16_t;
+       typedef __char32_t char32_t;
+#    endif
 
 #  define _LIBCPP_PREFERRED_ALIGNOF(_Tp) __alignof(_Tp)
 
@@ -684,7 +686,8 @@ typedef __char32_t char32_t;
         defined(__APPLE__) ||                                                                                          \
         defined(__MVS__) ||                                                                                            \
         defined(_AIX) ||                                                                                               \
-        defined(__EMSCRIPTEN__)
+        defined(__EMSCRIPTEN__) ||                                                                                     \
+        defined(__QNX__)
 // clang-format on
 #      define _LIBCPP_HAS_THREAD_API_PTHREAD
 #    elif defined(__Fuchsia__)
@@ -699,6 +702,8 @@ typedef __char32_t char32_t;
 
 #  if defined(_LIBCPP_HAS_THREAD_API_PTHREAD)
 #    if defined(__ANDROID__) && __ANDROID_API__ >= 30
+#      define _LIBCPP_HAS_COND_CLOCKWAIT
+#    elif defined(__QNX__)
 #      define _LIBCPP_HAS_COND_CLOCKWAIT
 #    elif defined(_LIBCPP_GLIBC_PREREQ)
 #      if _LIBCPP_GLIBC_PREREQ(2, 30)

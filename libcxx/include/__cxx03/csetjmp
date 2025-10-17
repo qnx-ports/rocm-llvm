@@ -46,6 +46,11 @@ void longjmp(jmp_buf env, int val);
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
+#  if defined(__QNX__)
+#    undef longjmp
+#    undef setjmp
+#  endif
+
 using ::jmp_buf _LIBCPP_USING_IF_EXISTS;
 using ::longjmp _LIBCPP_USING_IF_EXISTS;
 

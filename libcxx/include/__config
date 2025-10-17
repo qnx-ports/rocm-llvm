@@ -358,8 +358,10 @@ _LIBCPP_HARDENING_MODE_DEBUG
 #    define decltype(...) __decltype(__VA_ARGS__)
 #    define _LIBCPP_CONSTEXPR
 
-typedef __char16_t char16_t;
-typedef __char32_t char32_t;
+#    if !defined(__QNX__)
+       typedef __char16_t char16_t;
+       typedef __char32_t char32_t;
+#    endif
 
 #  endif
 
@@ -828,7 +830,8 @@ typedef __char32_t char32_t;
         defined(__APPLE__) ||                                                                                          \
         defined(__MVS__) ||                                                                                            \
         defined(_AIX) ||                                                                                               \
-        defined(__EMSCRIPTEN__)
+        defined(__EMSCRIPTEN__) ||                                                                                     \
+        defined(__QNX__)
 // clang-format on
 #      undef _LIBCPP_HAS_THREAD_API_PTHREAD
 #      define _LIBCPP_HAS_THREAD_API_PTHREAD 1
@@ -846,6 +849,8 @@ typedef __char32_t char32_t;
 
 #  if _LIBCPP_HAS_THREAD_API_PTHREAD
 #    if defined(__ANDROID__) && __ANDROID_API__ >= 30
+#      define _LIBCPP_HAS_COND_CLOCKWAIT 1
+#    elif defined(__QNX__)
 #      define _LIBCPP_HAS_COND_CLOCKWAIT 1
 #    elif defined(_LIBCPP_GLIBC_PREREQ)
 #      if _LIBCPP_GLIBC_PREREQ(2, 30)

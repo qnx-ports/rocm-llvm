@@ -117,7 +117,11 @@ extern char __exidx_end;
 #elif defined(_LIBUNWIND_USE_DL_ITERATE_PHDR) ||                               \
       defined(_LIBUNWIND_USE_DL_UNWIND_FIND_EXIDX)
 
-#include <link.h>
+#if defined(__QNX__)
+  #include <sys/link.h>
+#else
+  #include <link.h>
+#endif
 
 #endif
 
@@ -364,6 +368,17 @@ LocalAddressSpace::getEncodedP(pint_t &addr, pint_t end, uint8_t encoding,
 // The ElfW() macro for pointer-size independent ELF header traversal is not
 // provided by <link.h> on some systems (e.g., FreeBSD). On these systems the
 // data structures are just called Elf_XXX. Define ElfW() locally.
+
+#if defined(__QNX__)
+  #if (__PTR_BITS__ == 32)
+    #define ElfW(type) Elf32_##type
+  #elif (__PTR_BITS__ == 64)
+    #define ElfW(type) Elf64_##type
+  #else
+    #error "QNX: __PTR_BITS__ is invalid"
+  #endif
+#endif
+
 #if !defined(ElfW)
   #define ElfW(type) Elf_##type
 #endif
@@ -437,8 +452,13 @@ static bool checkForUnwindInfoSegment(const Elf_Phdr *phdr, size_t image_base,
 #endif
 }
 
+#if defined(__QNX__)
+static int findUnwindSectionsByPhdr(const struct dl_phdr_info *pinfo,
+                                    size_t pinfo_size, void *data) {
+#else
 static int findUnwindSectionsByPhdr(struct dl_phdr_info *pinfo,
                                     size_t pinfo_size, void *data) {
+#endif
   auto cbdata = static_cast<dl_iterate_cb_data *>(data);
   if (pinfo->dlpi_phnum == 0 || cbdata->targetAddr < pinfo->dlpi_addr)
     return 0;

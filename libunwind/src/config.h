@@ -126,7 +126,7 @@
 #ifndef _LIBUNWIND_REMEMBER_HEAP_ALLOC
 #if defined(_LIBUNWIND_REMEMBER_STACK_ALLOC) || defined(__APPLE__) ||          \
     defined(__linux__) || defined(__ANDROID__) || defined(__MINGW32__) ||      \
-    defined(_LIBUNWIND_IS_BAREMETAL)
+    defined(__QNX__) || defined(_LIBUNWIND_IS_BAREMETAL)
 #define _LIBUNWIND_REMEMBER_ALLOC(_size) __builtin_alloca(_size)
 #define _LIBUNWIND_REMEMBER_FREE(_ptr)                                         \
   do {                                                                         \

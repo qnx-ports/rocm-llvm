@@ -495,6 +495,9 @@ COMPILER_RT_VISIBILITY int lprofReleaseMemoryPagesToOS(uintptr_t Begin,
     return _zx_vmar_op_range(_zx_vmar_root_self(), ZX_VMAR_OP_DECOMMIT,
                              (zx_vaddr_t)BeginAligned,
                              EndAligned - BeginAligned, NULL, 0);
+#elif defined(__QNX__)
+    return posix_madvise((void *)BeginAligned, EndAligned - BeginAligned,
+                   POSIX_MADV_DONTNEED);
 #else
     return madvise((void *)BeginAligned, EndAligned - BeginAligned,
                    MADV_DONTNEED);

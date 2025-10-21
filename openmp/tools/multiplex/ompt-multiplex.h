@@ -21,7 +21,7 @@
 #endif
 #include <dlfcn.h>
 #include <errno.h>
-#ifndef __HAIKU__
+#if !defined(__HAIKU__) && !defined(__QNX__)
 #include <execinfo.h>
 #endif
 #include <inttypes.h>

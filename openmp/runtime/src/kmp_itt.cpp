@@ -75,7 +75,7 @@ void __kmp_itt_initialize() {
   __kmp_str_buf_print(&buf, "OMP RTL Version %d.%d.%d", __kmp_version_major,
                       __kmp_version_minor, __kmp_version_build);
   if (__itt_api_version_ptr != NULL) {
-    __kmp_str_buf_print(&buf, ":%s", __itt_api_version());
+    __kmp_str_buf_print(&buf, ":%s", __itt_api_version() ? __itt_api_version() : "(null)");
   }
   version = __itt_mark_create(buf.str);
   __itt_mark(version, NULL);

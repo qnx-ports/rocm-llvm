@@ -19,6 +19,10 @@
 #include "kmp.h"
 #include "kmp_i18n.h"
 
+#if KMP_OS_QNX
+static const char* output_for_percent_s_NULL = "(null)";
+#endif
+
 /* String buffer.
 
    Usage:

@@ -32,7 +32,7 @@
 #if KMP_OS_AIX
 #include <sys/ldr.h>
 #include <libperfstat.h>
-#elif !KMP_OS_HAIKU
+#elif !KMP_OS_HAIKU && !KMP_OS_QNX
 #include <sys/syscall.h>
 #endif
 #include <sys/time.h>
@@ -78,6 +78,10 @@
 #include <procfs.h>
 #include <thread.h>
 #include <sys/loadavg.h>
+#endif
+
+#if KMP_OS_QNX
+#include <sys/mman.h>
 #endif
 
 #include <ctype.h>
@@ -1903,7 +1907,8 @@ static int __kmp_get_xproc(void) {
   __kmp_type_convert(sysconf(_SC_NPROCESSORS_CONF), &(r));
 
 #elif KMP_OS_DRAGONFLY || KMP_OS_FREEBSD || KMP_OS_NETBSD || KMP_OS_OPENBSD || \
-    KMP_OS_HAIKU || KMP_OS_HURD || KMP_OS_SOLARIS || KMP_OS_WASI || KMP_OS_AIX
+    KMP_OS_HAIKU || KMP_OS_HURD || KMP_OS_SOLARIS || KMP_OS_WASI || KMP_OS_AIX || \
+    KMP_OS_QNX
 
   __kmp_type_convert(sysconf(_SC_NPROCESSORS_ONLN), &(r));
 
@@ -2141,6 +2146,46 @@ int __kmp_is_address_mapped(void *addr) {
     if ((addr >= beginning) && (addr < ending)) {
       perms[2] = 0; // 3th and 4th character does not matter.
       if (strcmp(perms, "rw") == 0) {
+        // Memory we are looking for should be readable and writable.
+        found = 1;
+      }
+      break;
+    }
+  }
+
+  // Free resources.
+  fclose(file);
+  KMP_INTERNAL_FREE(name);
+#elif KMP_OS_QNX
+  char *name = __kmp_str_format("/proc/%d/pmap", getpid());
+  FILE *file = NULL;
+
+  file = fopen(name, "r");
+  KMP_ASSERT(file != NULL);
+
+  while(fgetc(file) != '\n')
+  {
+    // discard the first line
+  }
+
+  for (;;) {
+    void *beginning = NULL;
+    void *length = NULL;
+    void *flags = NULL;
+    void *perms = NULL;
+
+    rc = fscanf(file, "%p,%p,%p,%p %*[^\n]\n", &beginning, &length, &flags, &perms);
+    if (rc == EOF) {
+      break;
+    }
+
+    // Make sure all fields are read.
+    KMP_ASSERT((unsigned long long)(perms) & (PROT_READ >> 8)); 
+
+    // Ending address is not included in the region, but beginning is.
+    void *ending = (void*)((unsigned long long)(beginning) + (unsigned long long)(length));
+    if ((addr >= beginning) && (addr < ending)) {
+      if ((unsigned long long)(perms) & (PROT_WRITE >> 8)) {
         // Memory we are looking for should be readable and writable.
         found = 1;
       }

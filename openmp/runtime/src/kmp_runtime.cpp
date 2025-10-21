@@ -8929,7 +8929,7 @@ __kmp_determine_reduction_method(
 
 #if KMP_OS_LINUX || KMP_OS_DRAGONFLY || KMP_OS_FREEBSD || KMP_OS_NETBSD ||     \
     KMP_OS_OPENBSD || KMP_OS_WINDOWS || KMP_OS_DARWIN || KMP_OS_HAIKU ||       \
-    KMP_OS_HURD || KMP_OS_SOLARIS || KMP_OS_WASI || KMP_OS_AIX
+    KMP_OS_HURD || KMP_OS_SOLARIS || KMP_OS_WASI || KMP_OS_AIX || KMP_OS_QNX
 
     int teamsize_cutoff = 4;
 
@@ -8954,14 +8954,14 @@ __kmp_determine_reduction_method(
 #error "Unknown or unsupported OS"
 #endif // KMP_OS_LINUX || KMP_OS_DRAGONFLY || KMP_OS_FREEBSD || KMP_OS_NETBSD ||
        // KMP_OS_OPENBSD || KMP_OS_WINDOWS || KMP_OS_DARWIN || KMP_OS_HAIKU ||
-       // KMP_OS_HURD || KMP_OS_SOLARIS || KMP_OS_WASI || KMP_OS_AIX
+       // KMP_OS_HURD || KMP_OS_SOLARIS || KMP_OS_WASI || KMP_OS_AIX || KMP_OS_QNX
 
 #elif KMP_ARCH_X86 || KMP_ARCH_ARM || KMP_ARCH_AARCH || KMP_ARCH_MIPS ||       \
     KMP_ARCH_WASM || KMP_ARCH_PPC || KMP_ARCH_AARCH64_32 || KMP_ARCH_SPARC
 
 #if KMP_OS_LINUX || KMP_OS_DRAGONFLY || KMP_OS_FREEBSD || KMP_OS_NETBSD ||     \
     KMP_OS_OPENBSD || KMP_OS_WINDOWS || KMP_OS_HAIKU || KMP_OS_HURD ||         \
-    KMP_OS_SOLARIS || KMP_OS_WASI || KMP_OS_AIX
+    KMP_OS_SOLARIS || KMP_OS_WASI || KMP_OS_AIX || KMP_OS_QNX
 
     // basic tuning
 

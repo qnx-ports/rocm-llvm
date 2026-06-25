@@ -108,7 +108,7 @@ typedef uint_t uint;
 #endif
 
 #if defined(__NetBSD__) || defined(__DragonFly__) || defined(__GNU__) ||       \
-    defined(__MVS__)
+    defined(__MVS__) || defined(__QNX__)
 #define STATVFS_F_FLAG(vfs) (vfs).f_flag
 #else
 #define STATVFS_F_FLAG(vfs) (vfs).f_flags
@@ -248,6 +248,24 @@ std::string getMainExecutable(const char *argv0, void *MainAddr) {
   // If we don't have procfs mounted, fall back to argv[0]
   if (getprogpath(exe_path, argv0) != NULL)
     return exe_path;
+#elif defined(__QNX__)
+  char exe_path[PATH_MAX] = {};
+  const char *aPath = "/proc/self/exefile";
+  if (!sys::fs::exists(aPath)) {
+    return "";
+  }
+
+  int fd = open(aPath, O_RDONLY);
+  if(fd == -1) {
+    return "";
+  }
+
+  read(fd, exe_path, sizeof(exe_path));
+  if (char *real_path = realpath(exe_path, nullptr)) {
+      std::string ret = std::string(real_path);
+      free(real_path);
+      return ret;
+  }
 #elif defined(__linux__) || defined(__CYGWIN__) || defined(__gnu_hurd__) ||    \
     defined(__managarm__)
   char exe_path[PATH_MAX];
@@ -554,6 +572,9 @@ static bool is_local_impl(struct STATVFS &Vfs) {
 #elif defined(__MVS__)
   // The file system can have an arbitrary structure on z/OS; must go with the
   // conservative answer.
+  return false;
+#elif defined(__QNX__)
+  // Not supported on QNX
   return false;
 #else
   return !!(STATVFS_F_FLAG(Vfs) & MNT_LOCAL);

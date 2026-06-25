@@ -44,6 +44,14 @@
 #else
 #define BYTE_ORDER LITTLE_ENDIAN
 #endif
+#elif defined(__QNX__)
+#define BIG_ENDIAN 4321
+#define LITTLE_ENDIAN 1234
+#if defined(__LITTLEENDIAN__)
+#define BYTE_ORDER LITTLE_ENDIAN
+#else
+#define BYTE_ORDER BIG_ENDIAN
+#endif
 #elif defined(__MVS__)
 #define BIG_ENDIAN 4321
 #define LITTLE_ENDIAN 1234

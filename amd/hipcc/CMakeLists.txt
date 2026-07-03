@@ -15,8 +15,11 @@ option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-set(ADDITIONAL_SHARED_LIBRARIES_TO_LINK
-  libstdc++fs.so)
+if(CMAKE_SYSTEM_NAME STREQUAL "QNX")
+  set(ADDITIONAL_SHARED_LIBRARIES_TO_LINK)
+else()
+  set(ADDITIONAL_SHARED_LIBRARIES_TO_LINK libstdc++fs.so)
+endif()
 
 set(HIPCC_BIN
   hipcc)

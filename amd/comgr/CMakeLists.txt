@@ -215,8 +215,13 @@ endif()
 
 
 if (UNIX)
-  list(APPEND AMD_COMGR_PRIVATE_COMPILE_OPTIONS
-    -fno-rtti -Wall -Wno-attributes -fms-extensions -fvisibility=hidden)
+  if(CMAKE_SYSTEM_NAME STREQUAL "QNX")
+    list(APPEND AMD_COMGR_PRIVATE_COMPILE_OPTIONS
+      -fno-rtti -Wall -Wno-attributes -fno-ms-extensions -fvisibility=hidden)
+  else()
+    list(APPEND AMD_COMGR_PRIVATE_COMPILE_OPTIONS
+      -fno-rtti -Wall -Wno-attributes -fms-extensions -fvisibility=hidden)
+  endif()
   # TODO: Confirm this is actually needed due to LLVM/Clang code
   list(APPEND AMD_COMGR_PRIVATE_COMPILE_OPTIONS -fno-strict-aliasing)
   list(APPEND AMD_COMGR_PRIVATE_COMPILE_DEFINITIONS

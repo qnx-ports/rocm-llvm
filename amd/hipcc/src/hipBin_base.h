@@ -111,7 +111,8 @@ string RuntimeTypeStr(RuntimeType runtime) {
 
 enum OsType {
   lnx = 0,
-  windows
+  windows,
+  qnx
   // add new OS types to be added here
 };
 
@@ -121,6 +122,8 @@ string OsTypeStr(OsType os) {
     return "linux";
   case windows:
     return "windows";
+  case qnx:
+    return "qnx";
   // add new OS types to be added here
   default:
     return "invalid OsType";
@@ -260,7 +263,7 @@ class HipBinBase {
 
 HipBinBase::HipBinBase() {
   hipBinUtilPtr_ = hipBinUtilPtr_->getInstance();
-  readOSInfo();                 // detects if windows or linux
+  readOSInfo();                 // detects host OS (linux, qnx, windows)
   readEnvVariables();           // reads the environment variables
 }
 
@@ -268,6 +271,8 @@ HipBinBase::HipBinBase() {
 void HipBinBase::readOSInfo() {
 #if defined _WIN32 || defined  _WIN64
   osInfo_ = windows;
+#elif defined(__QNX__)
+  osInfo_ = qnx;
 #elif  defined __unix || defined __linux__
   osInfo_ = lnx;
 #endif
@@ -394,6 +399,11 @@ void HipBinBase::getSystemInfo() const {
     system("powershell -c \"Get-CIMInstance -query 'SELECT * FROM win32_VideoController' | "
            "ft AdapterCompatibility,InstalledDisplayDrivers,Name | "
            "Out-String -Width 1000 | findstr /B /C:'Advanced Micro Devices'\"");
+  } else if (os == qnx) {
+    cout << endl << "== QNX" << endl;
+    cout << "Hostname      :" << endl;
+    system("uname -n");
+    system("uname -a");
   } else {
     assert(os == lnx);
     cout << endl << "== Linux Kernel" << endl;
@@ -414,7 +424,11 @@ void HipBinBase::printEnvironmentVariables() const {
     string cmd = "echo PATH =";
     cmd += envVariables_.path_;
     system(cmd.c_str());
+#ifdef __QNX__
+    system("env | grep -E '^HIP|^HSA|^CUDA|^LD_LIBRARY_PATH'");
+#else
     system("env | egrep '^HIP|^HSA|^CUDA|^LD_LIBRARY_PATH'");
+#endif
   }
 }
 

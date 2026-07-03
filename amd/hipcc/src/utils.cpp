@@ -18,6 +18,9 @@ typedef std::string::size_type TSIZE;
 #endif
 #else
 #include <unistd.h>
+#if defined(__QNX__)
+#include <process.h>
+#endif
 #endif
 
 #include <iostream>
@@ -32,6 +35,14 @@ std::string hipcc::utils::getSelfPath() {
   TSIZE pos = TSTR(buffer).find_last_of(ENDLINE);
   TSTR wide = TSTR(buffer).substr(0, pos);
   path = std::string(wide.begin(), wide.end());
+#elif defined(__QNX__)
+  char buff[MAX_PATH_CHAR];
+  if (char *cmd = _cmdname(buff)) {
+    path = fs::path(cmd).parent_path().string();
+  } else {
+    std::cerr << "hipcc: failed to get executable path on QNX" << std::endl;
+    exit(-1);
+  }
 #else
   char buff[MAX_PATH_CHAR];
   ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff) - 1);

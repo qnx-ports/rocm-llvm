@@ -106,6 +106,7 @@ void tools::QNX::Linker::ConstructJob(Compilation &C, const JobAction &JA,
 
   addLinkerCompressDebugSectionsOption(ToolChain, Args, CmdArgs);
   AddLinkerInputs(ToolChain, Inputs, Args, CmdArgs, JA);
+  addHIPRuntimeLibArgs(ToolChain, C, Args, CmdArgs);
 
   if (!Args.hasArg(options::OPT_nostdlib, options::OPT_nodefaultlibs,
                    options::OPT_r)) {
@@ -218,6 +219,26 @@ void clang::driver::toolchains::QNX::addLibCxxIncludePaths(
     llvm::opt::ArgStringList &CC1Args) const {
   std::string inclxx = concat(getDriver().SysRoot, "/usr/include/c++/v1");
   addSystemInclude(DriverArgs, CC1Args, inclxx);
+}
+
+void clang::driver::toolchains::QNX::AddHIPIncludeArgs(
+    const ArgList &DriverArgs, ArgStringList &CC1Args) const {
+  RocmInstallation->AddHIPIncludeArgs(DriverArgs, CC1Args);
+}
+
+void clang::driver::toolchains::QNX::AddHIPRuntimeLibArgs(
+    const ArgList &Args, ArgStringList &CmdArgs) const {
+  CmdArgs.push_back(
+      Args.MakeArgString(StringRef("-L") + RocmInstallation->getLibPath()));
+
+  if (Args.hasFlag(options::OPT_frtlib_add_rpath,
+                   options::OPT_fno_rtlib_add_rpath, false)) {
+    SmallString<0> p = RocmInstallation->getLibPath();
+    llvm::sys::path::remove_dots(p, true);
+    CmdArgs.append({"-rpath", Args.MakeArgString(p)});
+  }
+
+  CmdArgs.push_back("-lamdhip64");
 }
 
 SanitizerMask clang::driver::toolchains::QNX::getSupportedSanitizers() const {

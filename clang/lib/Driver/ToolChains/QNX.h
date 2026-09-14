@@ -51,6 +51,10 @@ public:
                             llvm::opt::ArgStringList &CC1Args) const override;
   void addLibCxxIncludePaths(const llvm::opt::ArgList &DriverArgs,
                              llvm::opt::ArgStringList &CC1Args) const override;
+  void AddHIPIncludeArgs(const llvm::opt::ArgList &DriverArgs,
+                         llvm::opt::ArgStringList &CC1Args) const override;
+  void AddHIPRuntimeLibArgs(const llvm::opt::ArgList &Args,
+                            llvm::opt::ArgStringList &CmdArgs) const override;
   SanitizerMask getSupportedSanitizers() const override;
   CXXStdlibType GetDefaultCXXStdlibType() const override {
     return ToolChain::CST_Libcxx;
